@@ -22,11 +22,25 @@ def register_github_handlers(bot):
 
         # 3. Get formatted text from ui.py
         text = format_profile_text(data)
-        avatar = data.get("avatar_url") or ""
+        avatar = data.get("avatar_url")
 
-        # 4. Send to user
+        # 4. Send to user (With smart Fallbacks!)
         try:
-            bot.send_photo(message.chat.id, photo=avatar, caption=text, parse_mode="HTML")
+            if avatar:
+                # Try sending photo with caption (Limit: 1024 characters)
+                bot.send_photo(message.chat.id, photo=avatar, caption=text, parse_mode="HTML")
+            else:
+                # If they have no avatar, just send the text
+                bot.send_message(message.chat.id, text, parse_mode="HTML", disable_web_page_preview=True)
+                
         except Exception as e:
-            print(f"Send Photo Error: {e}")
-            bot.send_message(message.chat.id, "⚠️ Failed to send profile data.")
+            print(f"Caption too long or HTML error: {e}")
+            
+            try:
+                # FALLBACK: Send photo and text separately! (Text Limit: 4096 characters)
+                if avatar:
+                    bot.send_photo(message.chat.id, photo=avatar)
+                bot.send_message(message.chat.id, text, parse_mode="HTML", disable_web_page_preview=True)
+            except Exception as e2:
+                print(f"Complete Send Failure: {e2}")
+                bot.send_message(message.chat.id, "⚠️ Failed to format profile data. The user's bio might contain unsupported characters.")
