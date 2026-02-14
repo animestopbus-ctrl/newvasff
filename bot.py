@@ -23,12 +23,11 @@ register_github_handlers(bot)
 @app.route('/')
 def index():
     # Hardcoded Anime Scenery for the initial load (Nekosia API)
-    # The JS will handle the rotation later
     bg_api = "https://api.nekosia.cat/v1/get/image/neko"
     try:
         bg_url = requests.get(bg_api).json()['image']['url']['original']
     except:
-        bg_url = "https://images.unsplash.com/photo-1555066932-4365d14bab8c"
+        bg_url = "https://i.postimg.cc/sggGrLhn/18.png"
 
     html_content = f"""
 <!DOCTYPE html>
@@ -43,14 +42,30 @@ def index():
     <style>
         :root {{ --accent: #00f5ff; --glass: rgba(20,20,28,0.92); }}
         * {{ margin:0; padding:0; box-sizing:border-box; }}
-        body {{ font-family:'Inter',sans-serif; background:#000; color:#fff; min-height:100vh; overflow:hidden; }}
+        
+        /* FIX: Changed overflow from hidden to auto to allow scrolling */
+        body {{ 
+            font-family:'Inter',sans-serif; 
+            background:#000; 
+            color:#fff; 
+            min-height:100vh; 
+            overflow-y: auto !important; 
+            overflow-x: hidden;
+        }}
 
         /* WALLPAPER - FIXED LAYERING */
         .wall {{ position:fixed; inset:0; background-size:cover; background-position:center; transition:opacity 3.5s ease; opacity:0; z-index:1; filter:brightness(0.68) contrast(1.18); }}
         .wall.active {{ opacity:1; }}
         .overlay {{ position:fixed; inset:0; z-index:2; background:linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.94) 78%); }}
 
-        .app {{ position:relative; z-index:10; min-height:100vh; display:flex; flex-direction:column; }}
+        /* FIX: Ensure the app container allows its children to expand and scroll */
+        .app {{ 
+            position:relative; 
+            z-index:10; 
+            display:flex; 
+            flex-direction:column;
+            min-height: 100vh;
+        }}
 
         .header {{
             padding:16px 5%; background:rgba(10,10,15,0.95); backdrop-filter:blur(20px);
@@ -58,7 +73,7 @@ def index():
         }}
         .logo {{ font-family:'Space Grotesk'; font-size:28px; font-weight:700; letter-spacing:-2px; background:linear-gradient(90deg,#fff,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }}
 
-        .tab-content {{ display:none; flex:1; padding:90px 5% 90px; overflow-y:auto; max-width:720px; margin:0 auto; width:100%; }}
+        .tab-content {{ display:none; flex:1; padding:20px 5% 120px; max-width:720px; margin:0 auto; width:100%; }}
         .tab-content.active {{ display:block; animation:fadeIn 0.4s ease; }}
         @keyframes fadeIn {{ from {{ opacity:0; transform:translateY(20px); }} to {{ opacity:1; transform:none; }} }}
 
@@ -67,7 +82,7 @@ def index():
             background:rgba(10,10,15,0.95); backdrop-filter:blur(20px);
             display:flex; border-top:1px solid rgba(255,255,255,0.1);
         }}
-        .nav-item {{ flex:1; text-align:center; padding:10px 0 6px; color:rgba(255,255,255,0.65); font-size:12px; transition:0.3s; }}
+        .nav-item {{ flex:1; text-align:center; padding:10px 0 6px; color:rgba(255,255,255,0.65); font-size:12px; transition:0.3s; cursor:pointer; }}
         .nav-item.active {{ color:var(--accent); }}
         .nav-item i {{ font-size:23px; display:block; margin-bottom:3px; }}
 
@@ -199,10 +214,10 @@ def index():
 
         // ================== WALLPAPER ==================
         const wallpapers = [
-            'https://images.unsplash.com/photo-1555066932-4365d14bab8c?q=80&w=1920',
-            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1920',
-            'https://images.unsplash.com/photo-1558494949-ef0d38d3f9e3?q=80&w=1920',
-            'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=1920'
+            'https://i.postimg.cc/1tNwGVxC/5.png',
+            'https://i.postimg.cc/kX9tjGXP/16.png',
+            'https://i.postimg.cc/cC7txyhz/15.png',
+            'https://i.postimg.cc/gcNtrv0m/2.png'
         ];
         let currentWall = 0;
         function startWallpaper() {{
