@@ -12,6 +12,7 @@ package_path = Path(__file__).parent / "LastPerson07"
 sys.path.insert(0, str(package_path))
 
 from telebot import TeleBot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from LastPerson07.start import setup_LastPerson07_handlers
 
 # Bot configuration using walrus operator
@@ -25,21 +26,21 @@ bot: TeleBot = TeleBot(BOT_TOKEN)
 # Setup handlers
 setup_LastPerson07_handlers(bot)
 
-# Enhanced welcome message with match case pattern
+# Enhanced welcome message
 @bot.message_handler(commands=['start'])
 def send_welcome(message) -> None:
     welcome_text = """
 🌟 <b>Welcome to LastPerson07 GitHub Explorer!</b>
 
-I can fetch detailed GitHub profile information with beautiful interactive buttons.
+I can fetch detailed GitHub profile information with interactive buttons.
 
 🔍 <b>How to use:</b>
 Send <code>/github username</code> to explore any GitHub profile!
 
-✨ <b>New Premium Features:</b>
-• Colored button UI (primary, success, danger, secondary)
-• Custom emoji integration
-• Interactive action buttons
+✨ <b>Features:</b>
+• Beautiful UI with interactive buttons
+• GitHub profile exploration
+• Quick action buttons
 • Real-time data refresh
 
 💡 <b>Example:</b>
@@ -48,72 +49,41 @@ Send <code>/github username</code> to explore any GitHub profile!
 Type /help for more commands.
     """.strip()
     
-    # Premium buttons with emoji ID
-    EMOJI_ID: str = "5474667187258006816"
+    # Create welcome buttons using compatible method
+    markup = InlineKeyboardMarkup()
+    markup.row(
+        InlineKeyboardButton("🚀 Get Started", callback_data="github_retry_torvalds"),
+        InlineKeyboardButton("📚 View Help", callback_data="github_help")
+    )
+    markup.row(
+        InlineKeyboardButton("⭐ Premium Demo", callback_data="github_premium_demo")
+    )
     
-    welcome_buttons: dict[str, list] = {
-        "inline_keyboard": [
-            [
-                {
-                    "text": "🚀 Get Started",
-                    "callback_data": "github_retry_torvalds",
-                    "style": "primary"
-                },
-                {
-                    "text": "📚 View Help", 
-                    "callback_data": "github_help",
-                    "style": "secondary"
-                }
-            ],
-            [
-                {
-                    "text": "🔥 Premium Demo",
-                    "callback_data": "github_premium_demo",
-                    "icon_custom_emoji_id": EMOJI_ID
-                }
-            ]
-        ]
-    }
-    
-    bot.send_message(message.chat.id, welcome_text, parse_mode="HTML", reply_markup=welcome_buttons)
+    bot.send_message(message.chat.id, welcome_text, parse_mode="HTML", reply_markup=markup)
 
-# Handle non-command messages with structural pattern matching
+# Handle non-command messages
 @bot.message_handler(func=lambda message: True)
 def handle_non_command(message) -> None:
     help_text = """
 🤖 <b>LastPerson07 GitHub Bot</b>
 
-I'm here to help you explore GitHub profiles with premium button UI!
+I'm here to help you explore GitHub profiles!
 
 Use <code>/github username</code> to get started.
 
 🔍 <b>Try it now:</b>
     """.strip()
     
-    buttons: dict[str, list] = {
-        "inline_keyboard": [
-            [
-                {
-                    "text": "🔍 Search Profile",
-                    "switch_inline_query_current_chat": "/github "
-                }
-            ],
-            [
-                {
-                    "text": "🌰 Example: torvalds",
-                    "callback_data": "github_retry_torvalds",
-                    "style": "secondary"
-                },
-                {
-                    "text": "⭐ Premium",
-                    "callback_data": "github_premium_demo",
-                    "icon_custom_emoji_id": "5474667187258006816"
-                }
-            ]
-        ]
-    }
+    markup = InlineKeyboardMarkup()
+    markup.row(
+        InlineKeyboardButton("🔍 Search Profile", switch_inline_query_current_chat="/github ")
+    )
+    markup.row(
+        InlineKeyboardButton("🌰 Example: torvalds", callback_data="github_retry_torvalds"),
+        InlineKeyboardButton("⭐ Premium", callback_data="github_premium_demo")
+    )
     
-    bot.send_message(message.chat.id, help_text, parse_mode="HTML", reply_markup=buttons)
+    bot.send_message(message.chat.id, help_text, parse_mode="HTML", reply_markup=markup)
 
 if __name__ == "__main__":
     print("🤖 LastPerson07 GitHub Bot is running on Python 3.12.9...")
