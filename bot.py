@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import os
 import sys
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -12,7 +13,6 @@ package_path = Path(__file__).parent / "LastPerson07"
 sys.path.insert(0, str(package_path))
 
 from telebot import TeleBot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from LastPerson07.start import setup_LastPerson07_handlers
 
 # Bot configuration using walrus operator
@@ -49,6 +49,8 @@ Send <code>/github username</code> to explore any GitHub profile!
 Type /help for more commands.
     """.strip()
     
+    from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+    
     # Create welcome buttons using compatible method
     markup = InlineKeyboardMarkup()
     markup.row(
@@ -74,6 +76,8 @@ Use <code>/github username</code> to get started.
 🔍 <b>Try it now:</b>
     """.strip()
     
+    from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+    
     markup = InlineKeyboardMarkup()
     markup.row(
         InlineKeyboardButton("🔍 Search Profile", switch_inline_query_current_chat="/github ")
@@ -85,6 +89,35 @@ Use <code>/github username</code> to get started.
     
     bot.send_message(message.chat.id, help_text, parse_mode="HTML", reply_markup=markup)
 
+def safe_polling(retry_count: int = 0) -> None:
+    """Safe polling with retry logic for conflict errors"""
+    max_retries = 5
+    base_delay = 10  # seconds
+    
+    try:
+        print(f"🤖 Starting LastPerson07 GitHub Bot (Attempt {retry_count + 1})...")
+        bot.polling(none_stop=True, timeout=60)
+    except Exception as e:
+        error_msg = str(e).lower()
+        
+        # Check for conflict error (multiple instances)
+        if "conflict" in error_msg and "getupdates" in error_msg:
+            if retry_count < max_retries:
+                delay = base_delay * (2 ** retry_count)  # Exponential backoff
+                print(f"⚠️  Bot conflict detected. Retrying in {delay} seconds...")
+                time.sleep(delay)
+                safe_polling(retry_count + 1)
+            else:
+                print("❌ Max retries exceeded. Another bot instance might be running.")
+                print("💡 Solution: Check if multiple containers/processes are running your bot.")
+        else:
+            print(f"❌ Unexpected error: {e}")
+            # Restart after a delay for other errors
+            if retry_count < max_retries:
+                delay = 30
+                print(f"🔄 Restarting in {delay} seconds...")
+                time.sleep(delay)
+                safe_polling(retry_count + 1)
+
 if __name__ == "__main__":
-    print("🤖 LastPerson07 GitHub Bot is running on Python 3.12.9...")
-    bot.polling(none_stop=True)
+    safe_polling()
