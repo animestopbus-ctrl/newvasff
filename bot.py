@@ -43,7 +43,7 @@ def index():
         :root {{ --accent: #00f5ff; --glass: rgba(20,20,28,0.92); }}
         * {{ margin:0; padding:0; box-sizing:border-box; }}
         
-        /* FIX: Changed overflow from hidden to auto to allow scrolling */
+        /* FIX: ALLOW NATURAL SCROLLING */
         body {{ 
             font-family:'Inter',sans-serif; 
             background:#000; 
@@ -53,18 +53,18 @@ def index():
             overflow-x: hidden;
         }}
 
-        /* WALLPAPER - FIXED LAYERING */
-        .wall {{ position:fixed; inset:0; background-size:cover; background-position:center; transition:opacity 3.5s ease; opacity:0; z-index:1; filter:brightness(0.68) contrast(1.18); }}
+        /* WALLPAPER - FIXED TO STATIC PER SESSION */
+        .wall {{ position:fixed; inset:0; background-size:cover; background-position:center; z-index:1; filter:brightness(0.68) contrast(1.18); }}
         .wall.active {{ opacity:1; }}
-        .overlay {{ position:fixed; inset:0; z-index:2; background:linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.94) 78%); }}
+        .overlay {{ position:fixed; inset:0; z-index:2; background:linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.94) 78%); pointer-events: none; }}
 
-        /* FIX: Ensure the app container allows its children to expand and scroll */
+        /* FIX: ENSURE CONTAINER ALLOWS SCROLLING */
         .app {{ 
             position:relative; 
             z-index:10; 
+            min-height:100vh; 
             display:flex; 
-            flex-direction:column;
-            min-height: 100vh;
+            flex-direction:column; 
         }}
 
         .header {{
@@ -86,43 +86,31 @@ def index():
         .nav-item.active {{ color:var(--accent); }}
         .nav-item i {{ font-size:23px; display:block; margin-bottom:3px; }}
 
-        /* SEARCH TAB */
-        .search-box {{ background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.18); border-radius:9999px; padding:8px 12px; display:flex; align-items:center; box-shadow:0 12px 35px rgba(0,0,0,0.5); }}
-        .search-box input {{ flex:1; background:transparent; border:none; outline:none; color:white; font-size:18px; padding:14px 18px; }}
-        .search-btn {{ width:56px; height:56px; background:var(--accent); color:#000; border:none; border-radius:9999px; font-size:24px; cursor:pointer; }}
+        /* SEARCH BOX FIX */
+        .search-box {{ background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.18); border-radius:9999px; padding:8px 12px; display:flex; align-items:center; box-shadow:0 12px 35px rgba(0,0,0,0.5); width:100%; }}
+        .search-box input {{ flex:1; background:transparent; border:none; outline:none; color:white; font-size:18px; padding:14px 18px; min-width:0; }}
+        .search-btn {{ width:56px; height:56px; background:var(--accent); color:#000; border:none; border-radius:9999px; font-size:24px; cursor:pointer; flex-shrink:0; }}
 
         .chips, .recent {{ display:flex; gap:10px; flex-wrap:wrap; margin-top:26px; justify-content:center; }}
         .chip, .recent-item {{ background:rgba(255,255,255,0.1); padding:10px 20px; border-radius:9999px; font-size:14.5px; cursor:pointer; transition:0.3s; }}
-        .chip:active, .recent-item:active {{ background:var(--accent); color:#000; transform:scale(0.95); }}
 
-        /* RESULT */
-        .result-card {{ background:var(--glass); border-radius:24px; overflow:hidden; margin-top:30px; border:1px solid rgba(255,255,255,0.1); }}
-        .profile-header {{ padding:28px; display:flex; gap:20px; align-items:center; background:linear-gradient(135deg,rgba(0,245,255,0.12),transparent); }}
-        .profile-header img {{ width:96px; height:96px; border-radius:20px; border:4px solid var(--accent); }}
+        /* RESULT & OVERFLOW FIX */
+        .result-card {{ background:var(--glass); border-radius:24px; overflow:hidden; margin-top:30px; border:1px solid rgba(255,255,255,0.1); width:100%; }}
+        .profile-header {{ padding:28px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; background:linear-gradient(135deg,rgba(0,245,255,0.12),transparent); }}
+        .profile-header img {{ width:96px; height:96px; border-radius:20px; border:4px solid var(--accent); object-fit: cover; }}
         .stats {{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:20px 28px; }}
         .stat {{ text-align:center; }}
         .stat span {{ font-size:23px; font-weight:700; color:var(--accent); display:block; }}
-        .action-btn {{ margin:20px 28px 28px; padding:17px; background:var(--accent); color:#000; font-weight:700; border:none; border-radius:18px; width:calc(100% - 56px); cursor:pointer; }}
+        
+        /* ACTION BUTTON FIX */
+        .action-btn {{ margin:10px 0; padding:17px; background:var(--accent); color:#000; font-weight:700; border:none; border-radius:18px; width:100%; cursor:pointer; }}
 
-        /* SAVED PROFILES */
-        .saved-item {{ background:rgba(255,255,255,0.07); padding:14px; border-radius:16px; display:flex; align-items:center; gap:16px; margin-bottom:12px; cursor:pointer; }}
+        .saved-item {{ background:rgba(255,255,255,0.07); padding:14px; border-radius:16px; display:flex; align-items:center; gap:16px; margin-bottom:12px; cursor:pointer; width:100%; }}
         .saved-item img {{ width:52px; height:52px; border-radius:12px; border:2px solid var(--accent); }}
 
-        /* DEVS */
-        .dev-grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:16px; }}
+        .dev-grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }}
         .dev-card {{ background:var(--glass); border-radius:20px; padding:18px; text-align:center; cursor:pointer; transition:0.3s; }}
-        .dev-card:hover {{ transform:translateY(-8px); background:rgba(0,245,255,0.12); }}
         .dev-card img {{ width:78px; height:78px; border-radius:50%; border:3px solid var(--accent); margin-bottom:12px; }}
-
-        /* ABOUT PAGE */
-        .about-section {{ margin-bottom:50px; }}
-        .about-section h2 {{ margin-bottom:20px; font-size:26px; }}
-        .feature-list {{ display:flex; flex-direction:column; gap:24px; }}
-        .feature {{ display:flex; gap:18px; }}
-        .feature i {{ font-size:32px; color:var(--accent); flex-shrink:0; margin-top:4px; }}
-
-        .stats-row {{ display:flex; justify-content:space-around; background:rgba(255,255,255,0.06); padding:30px 20px; border-radius:20px; margin:40px 0; }}
-        .stat-big span {{ font-size:36px; font-weight:700; color:var(--accent); display:block; }}
 
         .spinner {{ width:42px; height:42px; border:5px solid rgba(255,255,255,0.2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.9s linear infinite; margin:60px auto; }}
         @keyframes spin {{ to {{ transform:rotate(360deg); }} }}
@@ -187,17 +175,6 @@ def index():
                     <div class="feature"><i class="fas fa-share-alt"></i><div><strong>One-Tap Share</strong><br>Send any profile directly to chat</div></div>
                 </div>
             </div>
-
-            <div class="stats-row">
-                <div class="stat-big"><span id="stat-profiles">12400</span><small>Profiles pulled</small></div>
-                <div class="stat-big"><span id="stat-countries">47</span><small>Countries</small></div>
-                <div class="stat-big"><span id="stat-repos">89000</span><small>Repos scanned</small></div>
-            </div>
-
-            <div style="text-align:center;margin-top:60px;opacity:0.6;font-size:14px;">
-                Made for recruiters, researchers &amp; developers<br>
-                Version 2.4 • February 2026
-            </div>
         </div>
 
         <div class="bottom-nav">
@@ -212,35 +189,13 @@ def index():
         const tg = window.Telegram.WebApp;
         tg.expand(); tg.ready();
 
-        // ================== WALLPAPER ==================
-        const wallpapers = [
-            'https://i.postimg.cc/1tNwGVxC/5.png',
-            'https://i.postimg.cc/kX9tjGXP/16.png',
-            'https://i.postimg.cc/cC7txyhz/15.png',
-            'https://i.postimg.cc/gcNtrv0m/2.png'
-        ];
-        let currentWall = 0;
-        function startWallpaper() {{
-            document.getElementById('wall1').style.backgroundImage = `url(${{wallpapers[0]}})`;
-            document.getElementById('wall2').style.backgroundImage = `url(${{wallpapers[1]}})`;
-            setInterval(() => {{
-                currentWall = (currentWall + 1) % wallpapers.length;
-                const next = document.getElementById('wall2');
-                next.style.backgroundImage = `url(${{wallpapers[currentWall]}})`;
-                next.classList.add('active');
-                setTimeout(() => {{
-                    document.getElementById('wall1').style.backgroundImage = `url(${{wallpapers[currentWall]}})`;
-                    next.classList.remove('active');
-                }}, 3500);
-            }}, 15000);
-        }}
-
         // ================== TAB SYSTEM ==================
         function switchTab(n) {{
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(['search-tab','profile-tab','devs-tab','page-tab'][n]).classList.add('active');
             document.querySelectorAll('.nav-item')[n].classList.add('active');
+            window.scrollTo(0,0);
         }}
 
         // ================== TELEGRAM USER ==================
@@ -274,6 +229,7 @@ def index():
             localStorage.setItem('recentSearches', JSON.stringify(recent));
             renderRecent();
         }}
+
         function renderRecent() {{
             const container = document.getElementById('recent-searches');
             container.innerHTML = '';
@@ -329,13 +285,13 @@ def index():
                 const repoRes = await fetch(`https://api.github.com/users/${{username}}/repos?sort=stars&per_page=3`);
                 const repos = await repoRes.json();
 
-                let html = `<div class="result-card"><div class="profile-header"><img src="${{user.avatar_url}}"><div><h2>${{user.name || user.login}}</h2><p style="color:var(--accent);font-family:monospace;font-size:17px;">@${{user.login}}</p>${{user.bio ? `<p style="margin-top:14px;opacity:0.9;">${{user.bio}}</p>` : ''}}</div></div><div class="stats"><div class="stat"><span>${{user.public_repos}}</span><small>Repos</small></div><div class="stat"><span>${{user.followers}}</span><small>Followers</small></div><div class="stat"><span>${{user.following}}</span><small>Following</small></div></div><div style="padding:0 28px 20px;"><small style="opacity:0.6;">TOP REPOS</small>`;
+                let html = `<div class="result-card"><div class="profile-header"><img src="${{user.avatar_url}}"><div><h2>${{user.name || user.login}}</h2><p style="color:var(--accent);font-family:monospace;font-size:17px;">@${{user.login}}</p></div></div><div class="stats"><div class="stat"><span>${{user.public_repos}}</span><small>Repos</small></div><div class="stat"><span>${{user.followers}}</span><small>Followers</small></div><div class="stat"><span>${{user.following}}</span><small>Following</small></div></div><div style="padding:0 28px 20px;"><small style="opacity:0.6;">TOP REPOS</small>`;
 
                 repos.forEach(r => {{
                     html += `<div style="margin:10px 0;padding:14px;background:rgba(255,255,255,0.06);border-radius:14px;display:flex;justify-content:space-between;align-items:center;"><a href="${{r.html_url}}" target="_blank" style="color:white;text-decoration:none;">${{r.name}}</a><span style="color:var(--accent)">★ ${{r.stargazers_count}}</span></div>`;
                 }});
 
-                html += `</div><div style="display:flex;gap:12px;margin:0 28px 28px;"><button onclick="saveProfile(${{JSON.stringify(user).replace(/"/g,'&quot;')}});" class="action-btn" style="flex:1;"><i class="fas fa-bookmark"></i> Save</button><button onclick="shareProfile(${{JSON.stringify(user).replace(/"/g,'&quot;')}});" style="flex:1;background:rgba(255,255,255,0.1);color:white;border:none;border-radius:18px;font-weight:600;">Share</button></div></div>`;
+                html += `</div><div style="display:flex;gap:12px;padding:0 28px 28px;flex-wrap:wrap;"><button onclick="saveProfile(${{JSON.stringify(user).replace(/"/g,'&quot;')}});" class="action-btn" style="flex:1;min-width:120px;"><i class="fas fa-bookmark"></i> Save</button><button onclick="shareProfile(${{JSON.stringify(user).replace(/"/g,'&quot;')}});" style="flex:1;min-width:120px;background:rgba(255,255,255,0.1);color:white;border:none;border-radius:18px;font-weight:600;">Share</button></div></div>`;
 
                 resultDiv.innerHTML = html;
                 addToRecent(username);
@@ -348,7 +304,7 @@ def index():
             tg.share({{
                 url: user.html_url,
                 title: `${{user.name || user.login}} on GitHub`,
-                message: `Check out this awesome developer: @${{user.login}}`
+                message: `Check out this developer: @${{user.login}}`
             }});
         }}
 
@@ -357,7 +313,6 @@ def index():
             let saved = JSON.parse(localStorage.getItem('savedGitProfiles') || '[]');
             if (!saved.find(u => u.login === user.login)) {{
                 saved.unshift(user);
-                if (saved.length > 15) saved.pop();
                 localStorage.setItem('savedGitProfiles', JSON.stringify(saved));
             }}
             switchTab(1);
@@ -369,7 +324,7 @@ def index():
             container.innerHTML = '';
             const saved = JSON.parse(localStorage.getItem('savedGitProfiles') || '[]');
             if (saved.length === 0) {{
-                container.innerHTML = `<p style="text-align:center;padding:60px 20px;opacity:0.5;">No saved profiles yet.<br>Save some from Search tab.</p>`;
+                container.innerHTML = `<p style="text-align:center;padding:60px 20px;opacity:0.5;">No saved profiles yet.</p>`;
                 return;
             }}
             saved.forEach(user => {{
@@ -395,7 +350,6 @@ def index():
 
         // ================== INIT ==================
         window.onload = () => {{
-            startWallpaper();
             showUser();
             renderChips();
             renderRecent();
