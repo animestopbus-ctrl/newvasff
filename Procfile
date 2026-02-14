@@ -1,1 +1,1 @@
-web: ./start.sh
+web: gunicorn bot:app
