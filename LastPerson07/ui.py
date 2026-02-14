@@ -1,36 +1,6 @@
-from typing import Dict, Tuple, TypedDict
+from typing import Dict, Tuple
 from datetime import datetime
-from dataclasses import dataclass
-
-# Type definitions for better type safety
-class ButtonConfig(TypedDict, total=False):
-    text: str
-    url: str
-    callback_data: str
-    style: str
-    icon_custom_emoji_id: str
-
-@dataclass
-class ProfileData:
-    """Dataclass for GitHub profile data"""
-    name: str
-    login: str
-    id: int
-    avatar_url: str
-    html_url: str
-    blog: str
-    location: str
-    company: str
-    email: str
-    hireable: str
-    twitter: str
-    bio: str
-    followers: int
-    following: int
-    public_repos: int
-    public_gists: int
-    created_at: str
-    updated_at: str
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 class LastPerson07UI:
     def __init__(self) -> None:
@@ -54,12 +24,9 @@ class LastPerson07UI:
             "updated": "🔄",
             "link": "🔗"
         }
-        
-        # Premium emoji ID for buttons
-        self.EMOJI_ID: str = "5474667187258006816"
     
     def format_date(self, date_str: str) -> str:
-        """Format ISO date to readable format using pattern matching"""
+        """Format ISO date to readable format"""
         match date_str:
             case "N/A" | "" | None:
                 return "N/A"
@@ -71,106 +38,89 @@ class LastPerson07UI:
                     return date_str
     
     def create_profile_message(self, data: Dict) -> Tuple[str, str]:
-        """Create formatted profile message with Python 3.12 features"""
-        # Use walrus operator for cleaner data extraction
-        profile_data: ProfileData = ProfileData(
-            name=data.get("name") or "N/A",
-            login=data.get("login") or "N/A",
-            id=data.get("id") or 0,
-            avatar_url=data.get("avatar_url") or "",
-            html_url=data.get("html_url") or "",
-            blog=data.get("blog") or "N/A",
-            location=data.get("location") or "N/A",
-            company=data.get("company") or "N/A",
-            email=data.get("email") or "N/A",
-            hireable="✅" if data.get("hireable") else "❌",
-            twitter=data.get("twitter_username") or "N/A",
-            bio=data.get("bio") or "No bio provided.",
-            followers=data.get("followers", 0),
-            following=data.get("following", 0),
-            public_repos=data.get("public_repos", 0),
-            public_gists=data.get("public_gists", 0),
-            created_at=self.format_date(data.get("created_at") or "N/A"),
-            updated_at=self.format_date(data.get("updated_at") or "N/A"),
-        )
+        """Create formatted profile message"""
+        # Extract and sanitize data
+        name = data.get("name") or "N/A"
+        login = data.get("login") or "N/A"
+        id_ = data.get("id") or "N/A"
+        avatar_url = data.get("avatar_url") or ""
+        html_url = data.get("html_url") or ""
+        blog = data.get("blog") or "N/A"
+        location = data.get("location") or "N/A"
+        company = data.get("company") or "N/A"
+        email = data.get("email") or "N/A"
+        hireable = "✅" if data.get("hireable") else "❌"
+        twitter = data.get("twitter_username") or "N/A"
+        bio = data.get("bio") or "No bio provided."
+        followers = data.get("followers", 0)
+        following = data.get("following", 0)
+        public_repos = data.get("public_repos", 0)
+        public_gists = data.get("public_gists", 0)
+        created_at = self.format_date(data.get("created_at") or "N/A")
+        updated_at = self.format_date(data.get("updated_at") or "N/A")
         
-        # Enhanced f-string with Python 3.12 features
-        text: str = f"""
+        # Create formatted message
+        text = f"""
 {self.emojis['profile']} <b>GitHub Profile Explorer</b>
         
-{self.emojis['name']} <b>{profile_data.name}</b> <i>(@{profile_data.login})</i>
+{self.emojis['name']} <b>{name}</b> <i>(@{login})</i>
 
-{self.emojis['bio']} <i>"{profile_data.bio}"</i>
+{self.emojis['bio']} <i>"{bio}"</i>
 
 📊 <b>GitHub Stats:</b>
-{self.emojis['repos']} Repositories: <b>{profile_data.public_repos}</b>
-{self.emojis['gists']} Gists: <b>{profile_data.public_gists}</b>
-{self.emojis['followers']} Followers: <b>{profile_data.followers}</b> | {self.emojis['following']} Following: <b>{profile_data.following}</b>
+{self.emojis['repos']} Repositories: <b>{public_repos}</b>
+{self.emojis['gists']} Gists: <b>{public_gists}</b>
+{self.emojis['followers']} Followers: <b>{followers}</b> | {self.emojis['following']} Following: <b>{following}</b>
 
 👤 <b>Profile Information:</b>
-{self.emojis['id']} ID: <code>{profile_data.id}</code>
-{self.emojis['location']} Location: {profile_data.location}
-{self.emojis['company']} Company: {profile_data.company}
-{self.emojis['email']} Email: {profile_data.email}
-{self.emojis['hireable']} Hireable: {profile_data.hireable}
-{self.emojis['twitter']} Twitter: {profile_data.twitter}
-{self.emojis['blog']} Blog: {profile_data.blog}
+{self.emojis['id']} ID: <code>{id_}</code>
+{self.emojis['location']} Location: {location}
+{self.emojis['company']} Company: {company}
+{self.emojis['email']} Email: {email}
+{self.emojis['hireable']} Hireable: {hireable}
+{self.emojis['twitter']} Twitter: {twitter}
+{self.emojis['blog']} Blog: {blog}
 
 📅 <b>Account Timeline:</b>
-{self.emojis['created']} Created: {profile_data.created_at}
-{self.emojis['updated']} Updated: {profile_data.updated_at}
+{self.emojis['created']} Created: {created_at}
+{self.emojis['updated']} Updated: {updated_at}
 
-{self.emojis['link']} <a href='{profile_data.html_url}'>View on GitHub</a>
+{self.emojis['link']} <a href='{html_url}'>View on GitHub</a>
         """.strip()
         
-        return profile_data.avatar_url, text
+        return avatar_url, text
     
-    def create_profile_buttons(self, data: Dict) -> Dict[str, list]:
-        """Create interactive buttons for GitHub profile using TypedDict"""
-        login: str = data.get("login", "")
-        html_url: str = data.get("html_url", "")
-        repos_url: str = data.get("repos_url", "")
-        followers_url: str = data.get("followers_url", "")
+    def create_profile_buttons(self, data: Dict) -> InlineKeyboardMarkup:
+        """Create interactive buttons for GitHub profile"""
+        login = data.get("login", "")
+        html_url = data.get("html_url", "")
+        repos_url = data.get("repos_url", "")
+        followers_url = data.get("followers_url", "")
         
-        buttons: list[list[ButtonConfig]] = [
-            [
-                ButtonConfig(
-                    text="🌟 View Profile",
-                    url=html_url,
-                    style="primary"
-                ),
-                ButtonConfig(
-                    text="📂 Repositories", 
-                    url=repos_url,
-                    style="success"
-                )
-            ],
-            [
-                ButtonConfig(
-                    text="👥 Followers",
-                    url=followers_url,
-                    style="primary"
-                ),
-                ButtonConfig(
-                    text="🔥 Premium View",
-                    callback_data=f"github_premium_{login}",
-                    icon_custom_emoji_id=self.EMOJI_ID
-                )
-            ],
-            [
-                ButtonConfig(
-                    text="🔄 Refresh Data",
-                    callback_data=f"github_refresh_{login}",
-                    style="secondary"
-                )
-            ]
-        ]
+        markup = InlineKeyboardMarkup()
         
-        return {"inline_keyboard": buttons}
+        # Row 1: Main actions
+        markup.row(
+            InlineKeyboardButton("🌟 View Profile", url=html_url),
+            InlineKeyboardButton("📂 Repositories", url=repos_url)
+        )
+        
+        # Row 2: Additional actions
+        markup.row(
+            InlineKeyboardButton("👥 Followers", url=followers_url),
+            InlineKeyboardButton("🔥 Premium", callback_data=f"github_premium_{login}")
+        )
+        
+        # Row 3: Refresh
+        markup.row(
+            InlineKeyboardButton("🔄 Refresh Data", callback_data=f"github_refresh_{login}")
+        )
+        
+        return markup
     
     def create_error_message(self, error_type: str, username: str = "") -> str:
-        """Create formatted error messages using match case"""
-        error_templates: Dict[str, str] = {
+        """Create formatted error messages"""
+        error_templates = {
             "no_params": """
 ❌ <b>Missing Username</b>
 
@@ -225,32 +175,18 @@ Something went wrong while fetching the profile.
         
         return error_templates.get(error_type, error_templates["general_error"]).strip()
     
-    def create_error_buttons(self, username: str = "") -> Dict[str, list]:
+    def create_error_buttons(self, username: str = "") -> InlineKeyboardMarkup:
         """Create buttons for error messages"""
-        if username:
-            buttons: list[list[ButtonConfig]] = [
-                [
-                    ButtonConfig(
-                        text="🔄 Try Again",
-                        callback_data=f"github_retry_{username}",
-                        style="primary"
-                    ),
-                    ButtonConfig(
-                        text="❌ Cancel",
-                        callback_data="github_cancel",
-                        style="danger"
-                    )
-                ]
-            ]
-        else:
-            buttons: list[list[ButtonConfig]] = [
-                [
-                    ButtonConfig(
-                        text="📚 View Help",
-                        callback_data="github_help",
-                        style="secondary"
-                    )
-                ]
-            ]
+        markup = InlineKeyboardMarkup()
         
-        return {"inline_keyboard": buttons}
+        if username:
+            markup.row(
+                InlineKeyboardButton("🔄 Try Again", callback_data=f"github_retry_{username}"),
+                InlineKeyboardButton("❌ Cancel", callback_data="github_cancel")
+            )
+        else:
+            markup.row(
+                InlineKeyboardButton("📚 View Help", callback_data="github_help")
+            )
+        
+        return markup
