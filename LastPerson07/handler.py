@@ -17,15 +17,13 @@ def register_github_handlers(bot):
         if message.caption and '/setavatar' in message.caption:
             bot.send_message(message.chat.id, "🔄 Uploading new face to Telegram...")
             try:
-                # 1. Download the photo you sent
                 file_info = bot.get_file(message.photo[-1].file_id)
                 downloaded_file = bot.download_file(file_info.file_path)
                 
-                # 2. Save it temporarily
                 with open("temp_avatar.png", 'wb') as new_file:
                     new_file.write(downloaded_file)
                 
-                # 3. RAW API REQUEST TO TELEGRAM (Bypassing the library!)
+                # RAW API REQUEST (Bypassing the library)
                 url = f"https://api.telegram.org/bot{bot.token}/setMyProfilePhoto"
                 with open("temp_avatar.png", "rb") as photo:
                     res = requests.post(url, files={"photo": photo}).json()
@@ -59,28 +57,43 @@ def register_github_handlers(bot):
         avatar = data.get("avatar_url")
         html_url = data.get("html_url", f"https://github.com/{username}")
         
-        # 🎛️ THE RAW JSON KEYBOARD (Forces Telegram 9.4 Features)
-        # Note: If you have a Premium emoji ID, replace "emoji_id" with the string of numbers!
+        # 🎛️ THE RAW JSON KEYBOARD (Using your exact 9.4 formatting!)
+        # Note: I left standard emojis in the "text", but if you want custom ones, 
+        # just add "icon_custom_emoji_id": "YOUR_EMOJI_ID" to any of these dictionaries!
         raw_markup = {
             "inline_keyboard": [
                 [
-                    # Primary color button!
-                    {"text": "🔗 Profile", "url": html_url, "color": "primary"}
+                    {
+                        "text": "🔗 Profile", 
+                        "url": html_url, 
+                        "style": "primary"
+                    }
                 ],
                 [
-                    # Default colors for standard links
-                    {"text": "📁 Repos", "url": f"{html_url}?tab=repositories"},
-                    {"text": "👤 Followers", "url": f"{html_url}?tab=followers"}
+                    {
+                        "text": "📁 Repos", 
+                        "url": f"{html_url}?tab=repositories",
+                        "style": "success"
+                    },
+                    {
+                        "text": "👤 Followers", 
+                        "url": f"{html_url}?tab=followers"
+                    }
                 ],
                 [
-                    # Secondary color!
-                    {"text": "➡️ Following", "url": f"{html_url}?tab=following", "color": "secondary"},
-                    {"text": "📑 Gists", "url": f"https://gist.github.com/{username}"}
+                    {
+                        "text": "➡️ Following", 
+                        "url": f"{html_url}?tab=following", 
+                        "style": "danger"
+                    },
+                    {
+                        "text": "📑 Gists", 
+                        "url": f"https://gist.github.com/{username}"
+                    }
                 ]
             ]
         }
         
-        # Convert dictionary to JSON string so Telegram can read it
         markup_json = json.dumps(raw_markup)
 
         try:
